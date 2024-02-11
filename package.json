@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.14.1"
+    "discord.js": "^14.14.1",
+    "sentiment": "^5.0.2"
   },
   "devDependencies": {
     "eslint": "^8.56.0"

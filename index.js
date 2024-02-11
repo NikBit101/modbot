@@ -2,8 +2,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
+const Sentiment = require('sentiment');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const sentiment = new Sentiment();
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -27,8 +29,37 @@ client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
+/*client.on('message', (message) => {
+	debugger;
+	console.log('The message was: ', message);
+		// Ignore messages from the bot itself
+		if (message.author.bot) return;
+		// Perform sentiment analysis
+		const result = sentiment.analyze(message.content);
+		const sentimentType = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
+
+		// Respond based on sentiment
+		message.channel.send(`The sentiment of the message is ${sentimentType}.`);
+});*/
+
+client.on('messageCreate', message => {
+	console.log(`${message.author.tag} in #${message.channel.name} sent: ${message.content}`);
+	
+	// Ignore messages from the bot itself
+	if (message.author.bot) return;
+	
+	// Perform sentiment analysis
+	const result = sentiment.analyze(message.content);
+	const sentimentType = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
+	console.log(result);
+
+	// Respond based on sentiment
+	message.channel.send(`The sentiment of the message is ${sentimentType}.`);
+});
+
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
+
 	const command = interaction.client.commands.get(interaction.commandName);
 
 	if (!command) {
@@ -47,5 +78,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+
 
 client.login(token);
