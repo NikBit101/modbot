@@ -23,32 +23,17 @@
     {
       "student_id": 3456789,
       "student_name": "Alice",
-      "student_surname": "Johnson",
-      "course_details": {
-        "course_name": "MSc Cyber Security and Forensic Information Technology",
-        "course_code": "C3558FTC",
-        "department": "School of Computing"
-      }
+      "student_surname": "Johnson"
     },
     {
       "student_id": 4567890,
       "student_name": "Nikita",
-      "student_surname": "Cernenko",
-      "course_details": {
-        "course_name": "BSc Software Engineering",
-        "course_code": "U0968PYC",
-        "department": "School of Computing"
-      }
+      "student_surname": "Cernenko"
     },
     {
       "student_id": 5678901,
       "student_name": "William",
-      "student_surname": "Woods",
-      "course_details": {
-        "course_name": "BSc Software Engineering",
-        "course_code": "U0968PYC",
-        "department": "School of Computing"
-      }
+      "student_surname": "Woods"
     }
   ]
 }

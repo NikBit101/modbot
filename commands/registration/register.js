@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const db = require('./database.json');
+const channelID = require('./channel-config.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -19,7 +20,7 @@ module.exports = {
 				.setRequired(true)),
 	async execute(interaction) {
 		// Check if the command was typed in only from 'get-access' channel
-		if (interaction.channelId != 1201937596175880224) { return; }
+		if (interaction.channelId != channelID['get-access-id']) { return; }
 
 		const student_id = interaction.options.getInteger('student_id');
 		const firstname = interaction.options.getString('firstname');

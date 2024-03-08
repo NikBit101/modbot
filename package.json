@@ -1,13 +1,13 @@
 {
   "name": "modbot",
   "version": "1.0.0",
-  "description": "",
+  "description": "An automated moderation bot designed for UoP Discord Server to tackle the manual work of solving or identifying issues within the server",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "NC101",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.14.1",
