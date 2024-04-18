@@ -81,7 +81,9 @@ client.on('messageCreate', message => {
 			});
 			admins.forEach(admin => {
 				setTimeout(() => {
-					admin.send(`\n\nMessage content: \n---\n${message.content}\n---`);
+					// Construct the link to the message
+					const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
+					admin.send(`\n\nMessage content: \n---\n${message.content} [${messageLink}]\n---`);
 				}, 1000);
 			});
 			admins.forEach(admin => {
