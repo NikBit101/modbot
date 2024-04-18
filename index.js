@@ -32,10 +32,11 @@ client.once(Events.ClientReady, readyClient => {
 
 client.on('messageCreate', message => {
 	console.log(`${message.author.tag} in #${message.channel.name} sent: ${message.content}`);
-	
+	const timestamp = new Date().toLocaleString();
+
 	// Ignore messages from the bot itself
 	if (message.author.bot) return;
-	console.log(message.guild.members.fetch('896492823669522503'));
+
 	/*
 	* first check if the message was sent anywhere BUT the '#get-access' channel
 	* then check if the message was sent from unauthorised user (i.e. the user with 0 roles assigned)
@@ -45,26 +46,19 @@ client.on('messageCreate', message => {
 		const rolesWithoutEveryone = message.member.roles.cache.filter(role => role.name !== '@everyone');
 		if (!rolesWithoutEveryone.size > 0) {
 			console.log(`${message.author.tag} is NOT part of any role, therefore will be deleted from the server.`);
-			const timestamp = new Date().toLocaleString();
-			//message.member.ban();
-			//console.log(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
+			message.member.ban();
+			console.log(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
 			
-			// inform admins of its actions
-			/*const adminRole = message.guild.roles.cache.find(role => role.name === 'admin'); // Replace 'Admin' with the name of your admin role
+			// inform admins of bot's actions
+			const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
                     if (adminRole) {
-                        const admins = adminRole.members;
-                        admins.forEach(admin => {*/
-												message.guild.members.fetch('896492823669522503')
-												.then(adminManage => {
-													const ad = adminManage.get('896492823669522503');
-													if (ad){ 
-														ad.send(`[${timestamp}] User ${message.member.user.tag} has been kicked from the server.`);
-													}
-													//);
-													else {
-														console.error("Admin role not found.");
-													}
-												})
+                        const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
+                        admins.forEach(admin => {
+							admin.send(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
+						});
+					} else {
+						console.error('Noone under admin role exists.')
+					}
 			return;
 		}
 	}
@@ -72,10 +66,24 @@ client.on('messageCreate', message => {
 	// Perform sentiment analysis
 	const result = sentiment.analyze(message.content);
 	const sentimentType = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
-	console.log(result);
 
-	// Respond based on sentiment
-	message.channel.send(`The sentiment of the message is ${sentimentType}.`);
+	if (sentimentType === 'negative') {
+		const resultString = JSON.stringify(result, null, 2);
+		// Warn the admins that a member has keft a negative message on a server
+		const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
+		if (adminRole) {
+			const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
+			admins.forEach((admin, index) => {
+				setTimeout(() => {
+					admin.send(`[${timestamp}] Warning! User ${message.author.tag} [${message.member}] has sent inappropriate message on [${message.channel.name}]`);
+					admin.send(`\nMessage content: \n---\n${message.content}\n---`);
+					admin.send(`\nThe sentimental analysis showed: \n---\n${resultString}\n---`);
+				}, (index+1) * 1000); // wait 1 second for each message to be processed and sent to admins
+			});
+		} else {
+			console.error('Noone under admin role exists.')
+		}
+	}
 });
 
 client.on(Events.InteractionCreate, async interaction => {

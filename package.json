@@ -4,6 +4,7 @@
   "description": "An automated moderation bot designed for UoP Discord Server to tackle the manual work of solving or identifying issues within the server",
   "main": "index.js",
   "scripts": {
+    "start": "node deploy_commands.js && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.14.1",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
     "sentiment": "^5.0.2"
   },
   "devDependencies": {
