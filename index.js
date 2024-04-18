@@ -5,7 +5,7 @@ const { token } = require('./config.json');
 const regServer = require('./commands/registration/channel-config.json');
 const Sentiment = require('sentiment');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers] });
 const sentiment = new Sentiment();
 
 client.commands = new Collection();
@@ -35,7 +35,7 @@ client.on('messageCreate', message => {
 	const timestamp = new Date().toLocaleString();
 
 	// Ignore messages from the bot itself
-	if (message.author.bot) return;
+	if (message.author.bot || !message.content) return;
 
 	/*
 	* first check if the message was sent anywhere BUT the '#get-access' channel
@@ -66,11 +66,14 @@ client.on('messageCreate', message => {
 	// Perform sentiment analysis
 	const result = sentiment.analyze(message.content);
 	const sentimentType = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
-
 	if (sentimentType === 'negative') {
 		const resultString = JSON.stringify(result, null, 2);
 		// Warn the admins that a member has keft a negative message on a server
 		const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
+		const isAdmin = message.member.roles.cache.has(adminRole?.id);
+
+		// ensure that admins are exempt from the message check
+		if (isAdmin) { return; }
 		if (adminRole) {
 			const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
 			// Wait 1 second for each message to be processed and sent to admins
@@ -119,5 +122,14 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
+client.on('guildMemberAdd', (member) => {
+	console.log(`New member has joined the server!: ${member}`);
+	const regChannel = member.guild.channels.cache.find(channel => channel.id === regServer['get-access-id']);
+	if (regChannel) {
+		regChannel.send(`Welcome ${member} to University of Portsmouth Discord Server! Please read the rules and instructions in the #get-access channel to gain access to the server.\n- Type in this command to register yourself: /reg [Your Student ID] [Your first name] [Your last name]`);
+	} else {
+		console.error('Error: #get-access channel not found or is inaccessible.');
+	}
+});
 
 client.login(token);
