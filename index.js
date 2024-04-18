@@ -73,12 +73,21 @@ client.on('messageCreate', message => {
 		const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
 		if (adminRole) {
 			const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
-			admins.forEach((admin, index) => {
+			// Wait 1 second for each message to be processed and sent to admins
+			admins.forEach(admin => {
 				setTimeout(() => {
-					admin.send(`[${timestamp}] Warning! User ${message.author.tag} [${message.member}] has sent inappropriate message on [${message.channel.name}]`);
-					admin.send(`\nMessage content: \n---\n${message.content}\n---`);
-					admin.send(`\nThe sentimental analysis showed: \n---\n${resultString}\n---`);
-				}, (index+1) * 1000); // wait 1 second for each message to be processed and sent to admins
+					admin.send(`\n\n[${timestamp}] Warning! User ${message.author.tag} [${message.member}] has sent inappropriate message on [${message.channel.name}]`);
+				}, 1000);
+			});
+			admins.forEach(admin => {
+				setTimeout(() => {
+					admin.send(`\n\nMessage content: \n---\n${message.content}\n---`);
+				}, 1000);
+			});
+			admins.forEach(admin => {
+				setTimeout(() => {
+					admin.send(`\n\nThe sentimental analysis showed: \n---\n${resultString}\n---`);
+				}, 1000);
 			});
 		} else {
 			console.error('Noone under admin role exists.')
