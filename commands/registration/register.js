@@ -26,12 +26,26 @@ module.exports = {
 		const firstname = interaction.options.getString('firstname');
 		const surname = interaction.options.getString('surname');
 		const student = db.students.find(student => student.student_id === student_id);
-    if (!student) {
-      return await interaction.reply('Invalid UP number. Please check your information and try again.');
-    }
-    
+		if (!student) {
+			return await interaction.reply('Invalid UP number. Please check your information and try again.');
+		}
+
 		if (student.student_name.toLowerCase() !== firstname.toLowerCase() || student.student_surname.toLowerCase() !== surname.toLowerCase()) {
-      return await interaction.reply('Name and UP numbers are mismatched.');
+			return await interaction.reply('Name and UP numbers are mismatched.');
+		}
+
+		// Make sure there is no duplicated up numbers and/or name
+		const guild = interaction.guild;
+		await guild.members.fetch();
+		const existingMember = guild.members.cache.find(member => {
+			const memberNickname = member.nickname ? member.nickname.toLowerCase() : null;
+			if (memberNickname !== null) {
+				return memberNickname === `${firstname.toLowerCase()} ${surname.toLowerCase().charAt(0)} / up${student_id}`;
+			}
+		});
+
+		if (existingMember) {
+			return await interaction.reply('A member with the same student number or name already exists.');
 		}
 
 		// Construct the new nickname
