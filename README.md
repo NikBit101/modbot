@@ -28,9 +28,9 @@ To get started with ModBot, follow these steps:
 - Create a `config.json` file in the project root directory and add your bot token:
   ```json
   {
-    	"clientId": "YOUR_BOT_ID",
-      "guildId": "YOUR_SERVER_ID",
-      "token": "YOUR_DISCORD_BOT_TOKEN"
+    "clientId": "YOUR_BOT_ID",
+    "guildId": "YOUR_SERVER_ID",
+    "token": "YOUR_DISCORD_BOT_TOKEN"
   }
   ```
 - Configure other settings such as role names, channel IDs, etc., as needed.
@@ -38,7 +38,7 @@ To get started with ModBot, follow these steps:
 - Additionally, create a `channel-config.json` file in the `commands/registration` folder path and add your channel's token for registration:
   ```json
   {
-  "get-access-id": "YOUR_SERVER_CHANNEL_TOKEN"
+    "get-access-id": "YOUR_SERVER_CHANNEL_TOKEN"
   }
   ```
 
