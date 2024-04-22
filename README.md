@@ -32,7 +32,6 @@ Before even getting this bot to function on your server, you will need to first 
 - **User Registration**: Allows new users to register by providing their student ID, first name, and last name. The bot automatically assigns them a nickname and role based on their registration information.
 - **Sentiment Analysis**: Utilizes sentiment analysis to identify and flag negative messages for review by server administrators.
 - **Custom Bad Word Filtering**: Automatically detects and filters out messages containing offensive language based on a customizable list of bad words.
-- **Channel Management**: Provides commands to manage channels, including creating and deleting channels.
 
 ## Getting Started
 
