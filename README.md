@@ -23,7 +23,7 @@ To get started with ModBot, follow these steps:
     ```
       cd modbot
       npm i discord.js
-      npm i sentiment.js
+      npm i sentiment
     ```
 
 4. **Configure the Bot**:
