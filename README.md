@@ -2,6 +2,31 @@
 
 ModBot is an automated moderation bot designed for the University of Portsmouth Discord Server to tackle the manual work of solving or detecting problems within the server.
 
+## Prequisities
+
+Before even getting this bot to function on your server, you will need to first create it through developer's portal page, setup some permissions for it and then invite it into your server. Here are the steps:
+
+- Navigate to [Discord Developer Portal](https://discord.com/developers/applications/) and sign in
+- On the `Applications` tab, click on `New Application` top right next to your discord avatar
+- Name the bot however you want (For example: portBot)
+
+- **[IMPORTANT]** Navigate over these sections to copy and save the information that will be required from this page
+  ### Bot Client ID
+  - Navigate to `OAuth2` page and look at `Client Information` section
+  - Press the `Copy` button under the `Client ID`, this ID will be used to allow you to identify and interact with your bot through Node.js code. Make note of this ID
+  - Navigate to `Bot` page and look at `TOKEN` section. Do note that this token can only be viewed once for security purposes. **NEVER under any circumstances NEVER EVER expose this token.** It is there to ensure the authorisation of your bot's communication between it and Discord. Press `Reset Token` and make note of the token.
+  ### Server ID
+  - Finally, navigate to your discord's server where you want to assign your bot to be there. Right-click it and click `Copy Server ID`. If you can't see this button, navigate to your discord account settings --> Extended settings --> Developer Mode - **ON**. Make note of the server ID.
+
+- Navigate to `Bot` tab, scroll down to `Authorization Flow` and `Privileged Gateway Intents` and ensure these permission are configured as listed:
+  - Public Bot - **OFF**
+  - SERVER MEMBERS INTENT - **ON**
+  - MESSAGE CONTENT INTENT - **ON**
+
+- Navigate to `OAuth2` tab, scroll down to `OAuth2 URL Generator` and make sure that at least the ```bot``` and ```applications.commands``` are ticked
+- Once configured, copy the provided link at the bottom of the page, then paste that into a new tab in browser, choose the server you want the bot to join and Woilah!
+- You should be able to look at your server and see the bot you just created on the member's list. If so, move on to `Getting Started` section of this spec.
+
 ## Features
 
 - **User Registration**: Allows new users to register by providing their student ID, first name, and last name. The bot automatically assigns them a nickname and role based on their registration information.
@@ -37,24 +62,23 @@ To get started with ModBot, follow these steps:
   ```
 - Configure other settings such as role names, channel IDs, etc., as needed.
 
-- Additionally, create a `channel-config.json` file in the `commands/registration` folder path and add your channel's token for registration:
+- Additionally, create a `channel-config.json` file in the `commands/registration` folder path and add your channel's token for registration part:
   ```json
   {
     "get-access-id": "YOUR_SERVER_CHANNEL_TOKEN"
   }
   ```
+  To get the ID of your channel, right-click it and press `Copy channel ID`, paste it to the key value above.
+
+   **Note:** Make sure that the bot's role is highest on the list of roles. That is to avoid possible errors of unauthorised permissions for the bot due to it being on low priority in terms of role list.
 
 4. **Run the Bot**: Start the bot by running the following command in terminal:
 ```npm start```
-
 
 5. **(Optional) Deploy Slash Commands**: If you make changes to slash commands, you can deploy them using the following command in terminal:
 ```node deploy_commands.js```
 
   Do note that the command ```npm start``` already does that for you.
-
-
-6. **Invite the Bot to Your Server**: Generate an invite link for your bot within developer's portal and add it to your Discord server with the necessary permissions.
 
 ## Usage
 
