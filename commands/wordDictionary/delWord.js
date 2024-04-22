@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const fs = require('fs');
-const path = require('path');
+const { isAdmin, openDictionary, writeToDictionary } = require('./utils');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,13 +11,12 @@ module.exports = {
         .setRequired(true)),
   async execute(interaction) {
     // First check if member typing the command has 'admin' role
-    if (!interaction.member.roles.cache.some(role => role.name === 'admin')) { return; }
+    if (!isAdmin(interaction.member)) { return; }
 
     const wordToDelete = interaction.options.getString('word');
-    const filePath = path.join(__dirname, 'badDictionary.json');
 
     try {
-      let data = JSON.parse(fs.readFileSync(filePath));
+      let data = await openDictionary();
       // first check if the provided word actually exists within a dictionary.
       if (!data.includes(wordToDelete)) {
         await interaction.reply(`The word "${wordToDelete}" does not exist inside the custom dictionary.`);
@@ -26,7 +24,8 @@ module.exports = {
       }
       // if it does exist, overwrite the dictionary with everything BUT the provided word
       data = data.filter(word => word !== wordToDelete);
-      fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
+      await writeToDictionary(data);
+
       await interaction.reply(`The word "${wordToDelete}" has been deleted from the custom dictionary.`);
     } catch (error) {
       console.error(error);

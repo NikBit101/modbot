@@ -65,7 +65,6 @@ module.exports = {
 			await interaction.reply('Failed to update nickname or assign the role.');
 			return;
 		}
-
 		await interaction.reply('Registration successful!');
 	},
 };

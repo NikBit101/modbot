@@ -8,12 +8,6 @@ const fs = require('node:fs');
 const regServer = require('./commands/registration/channel-config.json');
 const { token } = require('./config.json');
 
-/** FUTURE CONSIDERATION TO INCLUDE IN THE REPORT
- *  add a dictionary as a separate file and allow the bot to check the words based on that,
- *  only if the sentiment.js would not be able to identify a bad word.
- * 	Allow the bot have commands that easily let admins add/edit/delete messages or channels. 
- */
-
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers] });
 const sentiment = new Sentiment();
 
@@ -35,26 +29,31 @@ for (const folder of commandFolders) {
 	}
 }
 
-// Once the bot is ready to run
-client.once(Events.ClientReady, readyClient => {
-	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+// Handle unauthorized user messages
+function handleUnauthorizedUser(message) {
+  // Ban unauthorized user and inform admins
+  console.log(`${message.author.tag} is NOT part of any role, therefore will be deleted from the server.`);
+  message.member.ban().then(() => {
+    const timestamp = new Date().toLocaleString();
+    console.log(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
+    // Inform admins
+    const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
+    if (adminRole) {
+      const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
+      admins.forEach(admin => {
+        admin.send(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
+      });
+    } else {
+      console.error('No one under admin role exists.');
+    }
+  }).catch(error => {
+    console.error('Error banning unauthorized user:', error);
+  });
+}
 
-// When a member tries to type any message on the server
-client.on('messageCreate', message => {
-	const filePath = path.join(__dirname, 'commands', 'wordDictionary', 'badDictionary.json');
-	let badWords = [];
-	try {
-		const data = fs.readFileSync(filePath);
-		badWords = JSON.parse(data);
-	} catch (error) {
-		console.error('Error loading bad words:', error);
-	}
-	console.log(`${message.author.tag} in #${message.channel.name} sent: ${message.content}`);
-	const timestamp = new Date().toLocaleString();
-
-	// Ignore messages from the bot itself
-	if (message.author.bot || !message.content) return;
+function handleUnauthorisedMessage(message) {
+	// Ignore messages from bots or empty messages
+  if (message.author.bot || !message.content) return;
 
 	/*
 	* first check if the message was sent anywhere BUT the '#get-access' channel
@@ -62,27 +61,42 @@ client.on('messageCreate', message => {
 	* which is the user who bypassed the registration stage
 	*/
 	if (message.channelId !== regServer['get-access-id']) {
-		const rolesWithoutEveryone = message.member.roles.cache.filter(role => role.name !== '@everyone');
-		if (!rolesWithoutEveryone.size > 0) {
-			console.log(`${message.author.tag} is NOT part of any role, therefore will be deleted from the server.`);
-			message.member.ban();
-			console.log(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
+    const rolesWithoutEveryone = message.member.roles.cache.filter(role => role.name !== '@everyone');
+    if (!rolesWithoutEveryone.size > 0) {
+      handleUnauthorizedUser(message);
+    }
+  }
+}
 
-			// inform admins of bot's actions
-			const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
-			if (adminRole) {
-				const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
-				admins.forEach(admin => {
-					admin.send(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
-				});
-			} else {
-				console.error('Noone under admin role exists.')
-			}
-			return;
-		}
+function handleNegativeSentiment(message, result) {
+  // Warn admins about negative sentiment message
+  const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
+  const isAdmin = message.member.roles.cache.has(adminRole?.id);
+
+  // Ensure that admins are exempt from the message check
+  if (!isAdmin) {
+    const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
+    admins.forEach(admin => {
+      admin.send(`\n\n[${new Date().toLocaleString()}] Warning! User ${message.author.tag} [${message.member}] has sent an inappropriate message on [${message.channel.name}]`);
+      const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
+      admin.send(`\n\nMessage content: \n---\n${message.content} [${messageLink}]\n---`);
+      admin.send(`\n\nThe sentiment analysis showed: \n---\n${JSON.stringify(result, null, 2)}\n---`);
+    });
+		return;
+  }
+}
+
+function handleDictionary(message) {
+	let badWords = [];
+	try {
+		const data = fs.readFileSync(path.join(__dirname, 'commands', 'wordDictionary', 'badDictionary.json'));
+		badWords = JSON.parse(data);
+	} catch (error) {
+		console.error('Error loading bad words:', error);
 	}
+	console.log(`${message.author.tag} in #${message.channel.name} sent: ${message.content}`);
+	const timestamp = new Date().toLocaleString();
 
-	// Before sentiment analysis, check if a word exists in a custom dictionary
 	const containsBadWord = badWords.some(word => message.content.toLowerCase().includes(word.toLowerCase()));
 	if (containsBadWord) {
 		// Word from custom dictionary was found
@@ -105,37 +119,29 @@ client.on('messageCreate', message => {
 			console.error('Noone under admin role exists.')
 			return;
 		}
-	} else {
-		// Perform sentiment analysis
-		const result = sentiment.analyze(message.content);
-		const sentimentType = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
-		if (sentimentType === 'negative') {
-			const resultString = JSON.stringify(result, null, 2);
-			// Warn the admins that a member has keft a negative message on a server
-			const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
-			const isAdmin = message.member.roles.cache.has(adminRole?.id);
-
-			// ensure that admins are exempt from the message check
-			if (isAdmin) { return; }
-			if (adminRole) {
-				const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
-				// Wait 1 second for each message to be processed and sent to admins
-				admins.forEach(admin => {
-					admin.send(`\n\n[${timestamp}] Warning! User ${message.author.tag} [${message.member}] has sent inappropriate message on [${message.channel.name}]`);
-				});
-				admins.forEach(admin => {
-					// Construct the link to the message
-					const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
-					admin.send(`\n\nMessage content: \n---\n${message.content} [${messageLink}]\n---`);
-				});
-				admins.forEach(admin => {
-					admin.send(`\n\nThe sentimental analysis showed: \n---\n${resultString}\n---`);
-				});
-			} else {
-				console.error('Noone under admin role exists.');
-			}
-		}
 	}
+}
+
+function handleMessage(message) {
+	// Ignore message from the bot or blank message
+	if (message.author.bot || !message.content) return;
+
+	const result = sentiment.analyze(message.content);
+  const sentimentType = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
+  if (sentimentType === 'negative') {
+    handleNegativeSentiment(message, result);
+  } else { handleDictionary(message); }
+}
+
+// Once the bot is ready to run
+client.once(Events.ClientReady, readyClient => {
+	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+});
+
+
+client.on('messageCreate', message => {
+	handleMessage(message);
+	handleUnauthorisedMessage(message);
 });
 
 // When a member tries to interact with the bot through commands (/)
