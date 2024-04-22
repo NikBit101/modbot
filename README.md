@@ -14,17 +14,19 @@ ModBot is an automated moderation bot designed for the University of Portsmouth 
 To get started with ModBot, follow these steps:
 
 1. **Clone the Repository**: Clone this repository to your local machine using the following command in terminal:
-```git clone https://github.com/your-username/modbot.git```
+    ```
+      git clone https://github.com/NikBit101/modbot.git
+    ```
 
 
-2. **Install Dependencies**: Navigate to the project directory and install the required dependencies using npm:
+3. **Install Dependencies**: Navigate to the project directory and install the required dependencies using npm:
     ```
       cd modbot
       npm i discord.js
       npm i sentiment.js
     ```
 
-3. **Configure the Bot**:
+4. **Configure the Bot**:
 - Create a `config.json` file in the project root directory and add your bot token:
   ```json
   {
