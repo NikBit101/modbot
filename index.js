@@ -120,11 +120,8 @@ client.on('messageCreate', message => {
 			if (adminRole) {
 				const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
 				// Wait 1 second for each message to be processed and sent to admins
-				console.log(`[1] Reached here: ${admins}`);
 				admins.forEach(admin => {
-					console.log(admin);
 					admin.send(`\n\n[${timestamp}] Warning! User ${message.author.tag} [${message.member}] has sent inappropriate message on [${message.channel.name}]`);
-					console.log(`[2] Reached here: ${admin}`);
 				});
 				admins.forEach(admin => {
 					// Construct the link to the message
@@ -135,7 +132,7 @@ client.on('messageCreate', message => {
 					admin.send(`\n\nThe sentimental analysis showed: \n---\n${resultString}\n---`);
 				});
 			} else {
-				console.error('Noone under admin role exists.')
+				console.error('Noone under admin role exists.');
 			}
 		}
 	}

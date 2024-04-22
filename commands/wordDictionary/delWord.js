@@ -14,10 +14,8 @@ module.exports = {
     // First check if member typing the command has 'admin' role
     if (!interaction.member.roles.cache.some(role => role.name === 'admin')) { return; }
 
-
     const wordToDelete = interaction.options.getString('word');
     const filePath = path.join(__dirname, 'badDictionary.json');
-
 
     try {
       let data = JSON.parse(fs.readFileSync(filePath));

@@ -2,20 +2,36 @@ const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
-/*// Initialize array of bad words
-let badWords = [];
+async function checkIfExists(interaction, wordsToCheck, wordToAdd) {
+  console.log(wordsToCheck.includes(wordToAdd));
+  if (wordsToCheck.includes(wordToAdd)) {
+    await interaction.reply(`The word "${wordToAdd}" already exists in the custom dictionary.`);
+    return true;
+  }
+  return false;
+}
 
-// Load bad words from the dictionary before adding new one
-function loadBadWords() {
-  const filePath = path.join(__dirname, 'badDictionary.json');
+async function openDictionary() {
   try {
-      badWords = JSON.parse(fs.readFileSync(filePath));
+    const dictPath = path.join(__dirname, 'badDictionary.json');
+    const data = fs.readFileSync(dictPath);
+    return JSON.parse(data);
   } catch (error) {
-      console.error('Error loading bad words:', error);
+    await interaction.reply('An error occurred while loading the custom dictionary.');
+    return;
   }
 }
-loadBadWords();
-*/
+
+async function writeToDictionary(badArr) {
+  try {
+    const dictPath = path.join(__dirname, 'badDictionary.json');
+    fs.writeFileSync(dictPath, JSON.stringify(badArr, null, 4));
+  } catch (error) {
+    console.error('Error adding word:', error);
+    await interaction.reply('There was an error while adding the word to the custom dictionary.');
+  }
+}
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('addword')
@@ -30,33 +46,24 @@ module.exports = {
     if (!interaction.member.roles.cache.some(role => role.name === 'admin')) { return; }
 
     const wordToAdd = interaction.options.getString('word');
-
-    const filePath = path.join(__dirname, 'badDictionary.json');
+    
     let badWords = [];
     try {
-      const data = fs.readFileSync(filePath);
-      badWords = JSON.parse(data);
-    } catch (error) {
-      await interaction.reply('An error occurred while loading the custom dictionary.');
-      return;
+      badWords = await openDictionary();
+    } catch (e) {
+      return await interaction.reply(`An error ocurred while loading the dictionary: ${e.message}`);
     }
 
-    // Check if the word already exists in the array
-    if (badWords.includes(wordToAdd)) {
-      await interaction.reply(`The word "${wordToAdd}" already exists in the custom dictionary.`);
-      return;
-    }
-
-    // Add the word to the array
+    // Add the word to the array if it doesn't already exist within the dictionary
+    if (await checkIfExists(interaction, badWords, wordToAdd)) { return; }
     badWords.push(wordToAdd);
 
-    // Save the updated array to the JSON file
+    // Save the updated array to the dictionary
     try {
-      fs.writeFileSync(filePath, JSON.stringify(badWords, null, 4));
+      await writeToDictionary(badWords);
       await interaction.reply(`The word "${wordToAdd}" has been added to the custom dictionary.`);
-    } catch (error) {
-      console.error('Error adding word:', error);
-      await interaction.reply('There was an error while adding the word to the custom dictionary.');
+    } catch (e) {
+      return await interaction.reply(`An error ocurred while writing to the dictionary: ${e.message}`);
     }
   },
 };
