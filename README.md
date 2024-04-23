@@ -83,8 +83,8 @@ To get started with ModBot, follow these steps:
 
 Once the bot is running and configured, users can interact with it using various commands:
 
-- **/addword**: Add a word to the custom dictionary of bad words ('admin' role only).
-- **/deleteword**: Remove a word from the custom dictionary of bad words ('admin' role only).
+- **/addword**: Add a word to the custom dictionary of bad words ('Server Admin' role only).
+- **/deleteword**: Remove a word from the custom dictionary of bad words ('Server Admin' role only).
 - **/reg**: Register your student information to access the server. (only new members within '#get-access' channel)
 
 For detailed information on available commands and their usage, refer to the bot's help command or documentation.
