@@ -37,7 +37,7 @@ function handleUnauthorizedUser(message) {
     const timestamp = new Date().toLocaleString();
     console.log(`[${timestamp}] User ${message.author.tag} [${message.member}] has been banned from the server due to trying to communicate with 0 roles.`);
     // Inform admins
-    const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
+    const adminRole = message.guild.roles.cache.find(role => role.name === 'Server Admin');
     if (adminRole) {
       const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
       admins.forEach(admin => {
@@ -70,7 +70,7 @@ function handleUnauthorisedMessage(message) {
 
 function handleNegativeSentiment(message, result) {
   // Warn admins about negative sentiment message
-  const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
+  const adminRole = message.guild.roles.cache.find(role => role.name === 'Server Admin');
   const isAdmin = message.member.roles.cache.has(adminRole?.id);
 
   // Ensure that admins are exempt from the message check
@@ -101,7 +101,7 @@ function handleDictionary(message) {
 	if (containsBadWord) {
 		// Word from custom dictionary was found
 		// Warn the admins that a member has sent a negative message on a server
-		const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
+		const adminRole = message.guild.roles.cache.find(role => role.name === 'Server Admin');
 		const isAdmin = message.member.roles.cache.has(adminRole?.id);
 
 		// ensure that admins are exempt from the message check

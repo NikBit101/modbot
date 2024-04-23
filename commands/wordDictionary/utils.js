@@ -24,7 +24,7 @@ async function writeToDictionary(badArr) {
 }
 
 function isAdmin(member) {
-  return member.roles.cache.some(role => role.name === 'admin');
+  return member.roles.cache.some(role => role.name === 'Server Admin');
 }
 
 module.exports = { openDictionary, writeToDictionary, isAdmin };
