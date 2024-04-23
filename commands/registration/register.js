@@ -2,6 +2,19 @@ const { SlashCommandBuilder } = require('discord.js');
 const db = require('./database.json');
 const channelID = require('./channel-config.json');
 
+async function findMemberByNickname(guild, firstname, surname, student_id) {
+	await guild.members.fetch();
+	
+	const existingMember = guild.members.cache.find(member => {
+			const memberNickname = member.nickname ? member.nickname.toLowerCase() : null;
+			if (memberNickname !== null) {
+					return memberNickname === `${firstname.toLowerCase()} ${surname.toLowerCase().charAt(0)} / up${student_id}`;
+			}
+	});
+
+	return existingMember;
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('reg')
@@ -30,20 +43,16 @@ module.exports = {
 			return await interaction.reply('Invalid UP number. Please check your information and try again.');
 		}
 
-		if (student.student_name.toLowerCase() !== firstname.toLowerCase() || student.student_surname.toLowerCase() !== surname.toLowerCase()) {
+		const studentNameMatches = student.student_name.toLowerCase() === firstname.toLowerCase();
+    const studentSurnameMatches = student.student_surname.toLowerCase() === surname.toLowerCase();
+
+		if (!studentNameMatches || !studentSurnameMatches) {
 			return await interaction.reply('Name and UP numbers are mismatched.');
 		}
 
 		// Make sure there is no duplicated up numbers and/or name
 		const guild = interaction.guild;
-		await guild.members.fetch();
-		const existingMember = guild.members.cache.find(member => {
-			const memberNickname = member.nickname ? member.nickname.toLowerCase() : null;
-			if (memberNickname !== null) {
-				return memberNickname === `${firstname.toLowerCase()} ${surname.toLowerCase().charAt(0)} / up${student_id}`;
-			}
-		});
-
+		const existingMember = await findMemberByNickname(guild, firstname, surname, student_id);
 		if (existingMember) {
 			return await interaction.reply('A member with the same student number or name already exists.');
 		}
