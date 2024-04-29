@@ -1,8 +1,11 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'node:url';
 
-async function openDictionary() {
+export async function openDictionary() {
   try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
     const dictPath = path.join(__dirname, 'badDictionary.json');
     const data = fs.readFileSync(dictPath);
     return JSON.parse(data);
@@ -13,8 +16,10 @@ async function openDictionary() {
   }
 }
 
-async function writeToDictionary(badArr) {
+export async function writeToDictionary(badArr) {
   try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
     const dictPath = path.join(__dirname, 'badDictionary.json');
     fs.writeFileSync(dictPath, JSON.stringify(badArr, null, 4));
   } catch (error) {
@@ -23,8 +28,6 @@ async function writeToDictionary(badArr) {
   }
 }
 
-function isAdmin(member) {
-  return member.roles.cache.some(role => role.name === 'Server Admin');
+export function isAdmin(member) {
+  return member.roles.cache.some(role => role.name === 'admin');
 }
-
-module.exports = { openDictionary, writeToDictionary, isAdmin };

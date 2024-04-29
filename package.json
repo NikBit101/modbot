@@ -7,12 +7,15 @@
     "start": "node deploy_commands.js && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "type": "module",
   "keywords": [],
   "author": "NC101",
   "license": "ISC",
   "dependencies": {
+    "discord": "^0.8.2",
     "discord.js": "^14.14.1",
     "fs": "^0.0.1-security",
+    "node-fetch": "^3.3.2",
     "path": "^0.12.7",
     "sentiment": "^5.0.2"
   },
