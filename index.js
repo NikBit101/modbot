@@ -44,35 +44,37 @@ async function handleSuspiciousLinkOrFile(message) {
 	const regex = new RegExp(expression);
 	const urls = message.content.match(regex);
 	if (urls) {
-		// Check if the result is malicious
+		// Check if the url is malicious
 		const result = await scanURL(urls);
 
 		const adminRole = message.guild.roles.cache.find(role => role.name === 'admin');
 		if (result === 'high' || result === 'medium') {
 			// Inform admins about the suspicious link
 			try {
-			const channel = message.guild.channels.cache.get(regServer.default['bot-emergency-id']);
-			channel.send(`[WARNING] Suspicious link detected by ${message.author.tag} in ${message.channel.name}: ${urls[0]}\nThe user has been timed out for 24 hours.`);
-			//if (adminRole) {
+				const channel = message.guild.channels.cache.get(regServer.default['bot-emergency-id']);
+				channel.send(`[WARNING] Suspicious link detected by ${message.author.tag} in ${message.channel.name}: ${urls[0]}\nThe user has been timed out for 24 hours.`);
+				//if (adminRole) {
 				// warn through the channel
-				
+
 				const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
 				admins.forEach(admin => {
-				try {
-					admin.send(`[WARNING] Suspicious link detected by ${message.author.tag} in ${message.channel.name}: ${urls[0]}\nThe user has been timed out for 24 hours.`);
-				} catch (error) {
-					console.error('Error sending message to admin:', error);
-				}
-			});
-			// } else {
+					try {
+						admin.send(`[WARNING] Suspicious link detected by ${message.author.tag} in ${message.channel.name}: ${urls[0]}\nThe user has been timed out for 24 hours.`);
+					} catch (error) {
+						console.error('Error sending message to admin:', error);
+					}
+				});
+				// } else {
 				//console.error('No one under admin role exists.');
 				// }
-				
+
 				await message.delete();
 				await message.member.timeout(24 * 60 * 60 * 1000, 'Sent malicious/suspicious link').then(console.log(`Muted ${message.member}`));
 				return;
 			} catch (e) { console.error(e); }
 		} else if (result === 'low') {
+			const channel = message.guild.channels.cache.get(regServer.default['bot-emergency-id']);
+			channel.send(`[WARNING] mildly suspicious link was detected by ${message.author.tag} in ${message.channel.name}: ${urls[0]}`);
 			if (adminRole) {
 				const admins = message.guild.members.cache.filter(member => member.roles.cache.has(adminRole.id));
 				admins.forEach(admin => {

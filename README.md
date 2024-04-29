@@ -25,13 +25,23 @@ Before even getting this bot to function on your server, you will need to first 
 
 - Navigate to `OAuth2` tab, scroll down to `OAuth2 URL Generator` and make sure that at least the ```bot``` and ```applications.commands``` are ticked
 - Once configured, copy the provided link at the bottom of the page, then paste that into a new tab in browser, choose the server you want the bot to join and Woilah!
-- You should be able to look at your server and see the bot you just created on the member's list. If so, move on to `Getting Started` section of this spec.
+- You should be able to look at your server and see the bot you just created on the member's list. If so, move on to `Integrating Virustotal API into bot` section of this spec.
+
+## Integrating Virustotal API into bot
+
+- Navigate to [Virustotal Official Page](https://www.virustotal.com/) and sign in/up
+**Note:** Use the public/free API for now.
+- Once signed in, click at the top right of the page your profile name and then `API Key` button.
+- You will be presented with the information about your key, access level, rate and quota. However, what you'll need is the `API KEY` section at the top of the page. Click on the clipboard icon to the right of the hidden API key and make note of it for later stage.
+**Note:** Similarly with the Bot's token, DO NOT expose this key under any circumstance. It is only used by owners and trusted persona.
+- Once done, move on to `Getting Started` section
 
 ## Features
 
 - **User Registration**: Allows new users to register by providing their student ID, first name, and last name. The bot automatically assigns them a nickname and role based on their registration information.
 - **Sentiment Analysis**: Utilizes sentiment analysis to identify and flag negative messages for review by server administrators.
 - **Custom Bad Word Filtering**: Automatically detects and filters out messages containing offensive language based on a customizable list of bad words.
+- **Malicious Link Scanner** With the use of Virustotal's public API, this feature lets the bot scan any possible web-link, analyse its detection rate and perform actions based on the severity of the resulted scan.
 
 ## Getting Started
 
@@ -50,7 +60,7 @@ To get started with ModBot, follow these steps:
       npm i sentiment
     ```
 
-4. **Configure the Bot**:
+4. **Configure the Bot/API**:
 - Create a `config.json` file in the project root directory and add your bot token:
   ```json
   {
@@ -61,15 +71,23 @@ To get started with ModBot, follow these steps:
   ```
 - Configure other settings such as role names, channel IDs, etc., as needed.
 
-- Additionally, create a `channel-config.json` file in the `commands/registration` folder path and add your channel's token for registration part:
+- Additionally, create a `channel-config.json` file in the `commands/registration` folder path and add your channel's IDs for registration part:
   ```json
   {
-    "get-access-id": "YOUR_SERVER_CHANNEL_TOKEN"
+    "get-access-id": "YOUR_SERVER_CHANNEL_ID",
+    "bot-emergency-id": "YOUR_SERVER_CHANNEL_ID"
   }
   ```
   To get the ID of your channel, right-click it and press `Copy channel ID`, paste it to the key value above.
 
    **Note:** Make sure that the bot's role is highest on the list of roles. That is to avoid possible errors of unauthorised permissions for the bot due to it being on low priority in terms of role list.
+
+- Lastly, create a `vtConfig.json` file in the project root directory and add your Virustotal's API key like so:
+  ```json
+  {
+    "apiKey": "YOUR_VIRUSTOTAL_API_KEY"
+  }
+  ```
 
 4. **Run the Bot**: Start the bot by running the following command in terminal:
 ```npm start```
@@ -77,7 +95,7 @@ To get started with ModBot, follow these steps:
 5. **(Optional) Deploy Slash Commands**: If you make changes to slash commands, you can deploy them using the following command in terminal:
 ```node deploy_commands.js```
 
-  Do note that the command ```npm start``` already does that for you.
+    Do note that the command ```npm start``` already does that for you.
 
 ## Usage
 
