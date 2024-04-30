@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 
+// This modular function will attempt to open 'badDictionary.json' and parse the data back in JSON format
 export async function openDictionary() {
   try {
     const __filename = fileURLToPath(import.meta.url);
@@ -16,6 +17,7 @@ export async function openDictionary() {
   }
 }
 
+// This modular function will attempt to write the contents from 'badArr' parameter into 'badDictionary.json' 
 export async function writeToDictionary(badArr) {
   try {
     const __filename = fileURLToPath(import.meta.url);
@@ -28,6 +30,7 @@ export async function writeToDictionary(badArr) {
   }
 }
 
+// This modular function checks if the provided 'member' parameter contains an 'admin' role
 export function isAdmin(member) {
   return member.roles.cache.some(role => role.name === 'admin');
 }

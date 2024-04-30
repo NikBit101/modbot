@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import * as db from './database.json' assert { type: 'json' };
 import * as channelID from './channel-config.json' assert { type: 'json' };
 
+// Check for any existing member under same information from registration
 async function findMemberByNickname(guild, firstname, surname, student_id) {
 	await guild.members.fetch();
 
@@ -15,6 +16,12 @@ async function findMemberByNickname(guild, firstname, surname, student_id) {
 	return existingMember;
 }
 
+// Check for equal name/surname
+function isMatch(studentName, inputName) {
+	return studentName.toLowerCase() === inputName.toLowerCase();
+}
+
+// deploy the '/reg' command with given data & description
 export const data = new SlashCommandBuilder()
 	.setName('reg')
 	.setDescription('Register your student information to access the server.')
@@ -31,20 +38,24 @@ export const data = new SlashCommandBuilder()
 			.setDescription('Your Last name')
 			.setRequired(true));
 
+// call this after the user submitted the command
 export async function execute(interaction) {
 	// Check if the command was typed in only from 'get-access' channel
 	if (interaction.channelId != channelID.default['get-access-id']) { return; }
+
 	const student_id = interaction.options.getInteger('student_id');
 	const firstname = interaction.options.getString('firstname');
 	const surname = interaction.options.getString('surname');
 	const student = db.default.students.find(student => student.student_id === student_id);
+
+	// student with provided ID does not exist within the database
 	if (!student) {
 		return await interaction.reply('Invalid UP number. Please check your information and try again.');
 	}
 
-	const studentNameMatches = student.student_name.toLowerCase() === firstname.toLowerCase();
-	const studentSurnameMatches = student.student_surname.toLowerCase() === surname.toLowerCase();
-
+	// ensure the names from the user match the ones within database
+	const studentNameMatches = isMatch(student.student_name, firstname);
+	const studentSurnameMatches = isMatch(student.student_surname, surname);
 	if (!studentNameMatches || !studentSurnameMatches) {
 		return await interaction.reply('Name and UP numbers are mismatched.');
 	}
@@ -56,7 +67,7 @@ export async function execute(interaction) {
 		return await interaction.reply('A member with the same student number or name already exists.');
 	}
 
-	// Construct the new nickname
+	// Once all checked and validated, construct the new nickname
 	const newNickname = `${student.student_name} ${student.student_surname.charAt(0)} / up${student.student_id}`;
 
 	const role = interaction.guild.roles.cache.find(role => role.name === 'student');

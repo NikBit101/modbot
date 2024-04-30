@@ -19,7 +19,7 @@ const importPromises = commandFolders.flatMap(folder => {
     return commandFiles.map(file => {
         const filePath = path.join(commandsPath, file);
         const fileLink = pathToFileURL(filePath); // Convert path to URL
-        return import(fileLink); // Return import promise
+        return import(fileLink);
     });
 });
 

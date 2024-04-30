@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import apiKey from "./vtConfig.json" assert { type: 'json' };
 
+// This function performs calculations from the detection rate of the provided analysis data and returns its severity level
 function isMalicious(analysisResult) {
 	const results = analysisResult.data.attributes.stats;
 
@@ -13,13 +14,14 @@ function isMalicious(analysisResult) {
 
 	// Calculate the weighted sum
 	const weightedSum = (maliciousWeight * malCount) + (suspiciousWeight * susCount);
-	console.log(weightedSum);
+	// Determine the severity based on the sum
 	if (weightedSum <= 1) { return 'clean'; }
 	else if (weightedSum <= 3) { return 'low'; }
 	else if (weightedSum <= 6) { return 'medium'; }
 	else { return 'high'; }
 }
 
+// This modular function scans the provided 'url' using the VirusTotal API and checks if analysis is completed
 export async function scanURL(url) {
 	const options = {
 		method: 'POST',
@@ -32,6 +34,7 @@ export async function scanURL(url) {
 	};
 
 	try {
+		// Send the URL to VirusTotal for scanning with setup POST 'options'
 		const scanResult = await fetch('https://www.virustotal.com/api/v3/urls', options);
 		const response = await scanResult.json();
 		let analysisData;
@@ -45,10 +48,11 @@ export async function scanURL(url) {
 			});
 			analysisData = await analysisResponse.json();
 			console.log(analysisData.data.attributes.status);
-			// Add a delay before next poll (e.g., wait for 1 second)
+			// Add a delay before next poll (1 second)
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		}
 
+		// Determine if the URL is malicious based on the analysis data
 		return isMalicious(analysisData);
 	} catch (err) {
 		console.error(err);

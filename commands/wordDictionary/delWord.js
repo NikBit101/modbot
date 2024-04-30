@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { openDictionary, writeToDictionary, isAdmin } from './utils.mjs';
 
+// deploy the '/delWord' command with given data & description
 export const data = new SlashCommandBuilder()
   .setName('deleteword')
   .setDescription('Delete a word from the custom dictionary of bad words.')
@@ -8,12 +9,13 @@ export const data = new SlashCommandBuilder()
     option.setName('word')
       .setDescription('The word to delete from the custom dictionary.')
       .setRequired(true));
+
+// call this after the user submitted the command
 export async function execute(interaction) {
   // First check if member typing the command has 'admin' role
   if (!isAdmin(interaction.member)) { return; }
 
   const wordToDelete = interaction.options.getString('word');
-
   try {
     let data = await openDictionary();
     // first check if the provided word actually exists within a dictionary.
