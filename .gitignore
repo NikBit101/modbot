@@ -1,5 +1,7 @@
 node_modules
 config.json
+vtConfig.json
+./vtConfig.json
 ./config.json
 channel-config.json
 ./channel-config.json
