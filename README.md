@@ -114,6 +114,8 @@ Once the bot is running and configured, different users can interact with it usi
 
 For detailed information on available commands and their usage, refer to the bot's help command or documentation.
 
+Do also note that the bot currently has 2 roles within the code that it can scan through - `admin` and `student`. This can be set accordingly based on server roles and rules.
+
 ## Support
 
 If you encounter any issues or have questions about ModBot, feel free to open an issue on the GitHub repository.
