@@ -21,7 +21,6 @@ const __dirname = path.dirname(__filename);
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
-function getTime() { return new Date().toLocaleString(); }
 
 // Create and deploy a collection of commands
 for (const folder of commandFolders) {
@@ -40,6 +39,27 @@ for (const folder of commandFolders) {
 			console.error(`Error opening a command from ${filePath}: `, error);
 		});
 	}
+}
+
+function getTime() { return new Date().toLocaleString(); }
+
+const negativeMessageUserCounts = new Map();
+
+function setNegativeCount(message, channel) {
+	// Increment the negative message count for the user
+	const userId = message.author.id;
+	const count = negativeMessageUserCounts.get(userId) || 0;
+	negativeMessageUserCounts.set(userId, count + 1);
+	
+	// Check if the user has reached the limit
+	if (count + 1 >= 3) {
+		try {
+
+			message.member.timeout(12 * 60 * 60 * 1000, 'Sent inappropriate messages');
+			channel.send(`User ${message.author.tag} has been muted for sending too many negative messages.`);
+		} catch (e) { console.error(e); }
+	}
+	console.log(negativeMessageUserCounts);
 }
 
 async function handleSuspiciousLink(message) {
@@ -104,6 +124,7 @@ function handleNegativeSentiment(message, result) {
 	// Warn admins about negative sentiment message
 	try {
 		const channel = message.guild.channels.cache.get(regServer.default['bot-emergency-id']);
+		setNegativeCount(message, channel);
 		channel.send(`\n\n[${getTime()}] Warning! User ${message.author.tag} [${message.member}] has sent an inappropriate message on [${message.channel.name}]`);
 		const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
 		channel.send(`\n\nMessage content: \n---\n${message.content} [${messageLink}]\n---`);
@@ -127,6 +148,7 @@ function handleDictionary(message) {
 		// Provide report of the sentimental analysis of the message as well
 		try {
 			const channel = message.guild.channels.cache.get(regServer.default['bot-emergency-id']);
+			setNegativeCount(message, channel);
 			channel.send(`\n\n[${getTime()}] Warning! User ${message.author.tag} [${message.member}] has sent inappropriate message on [${message.channel.name}] based on custom dictionary.`);
 			const messageLink = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
 			channel.send(`\n\nMessage content: \n---\n${message.content} [${messageLink}]\n---`);

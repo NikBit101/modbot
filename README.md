@@ -53,14 +53,21 @@ To get started with ModBot, follow these steps:
     ```
 
 
-3. **Install Dependencies**: Navigate to the project directory and install the required dependencies using npm:
+2. **Install Dependencies**: There are two ways you can achieve this, navigate to the project directory and install the required dependencies using npm:
+
+ - [1] In here, you can manually install required packages to test their version compatibility for example.
     ```
       cd modbot
       npm i discord.js
       npm i sentiment
     ```
+ - [2] In this step, the 'npm install' command and its required dependencies are already pre-installed and using this method will active the installation
+    ```
+      cd modbot
+      npm start
+    ```
 
-4. **Configure the Bot/API**:
+3. **Configure the Bot/API**:
 - Create a `config.json` file in the project root directory and add your bot token:
   ```json
   {
@@ -99,7 +106,7 @@ To get started with ModBot, follow these steps:
 
 ## Usage
 
-Once the bot is running and configured, users can interact with it using various commands:
+Once the bot is running and configured, different users can interact with it using various commands:
 
 - **/addword**: Add a word to the custom dictionary of bad words ('Server Admin' role only).
 - **/deleteword**: Remove a word from the custom dictionary of bad words ('Server Admin' role only).
