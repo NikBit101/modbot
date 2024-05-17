@@ -53,12 +53,12 @@ To get started with ModBot, follow these steps:
     ```
 
 
-2. **Install Dependencies**: There are two ways you can achieve this, navigate to the project directory and install the required dependencies using npm:
+2. **Install Dependencies**: Navigate to the project directory and install the required dependencies using npm:
 
  - The 'npm install' command and its required dependencies are already pre-installed and using this method will active the installation
     ```
       cd modbot
-      npm start
+      npm start OR npm install
     ```
 
 3. **Configure the Bot/API**:
