@@ -24,16 +24,6 @@
       "student_id": 3456789,
       "student_name": "Alice",
       "student_surname": "Johnson"
-    },
-    {
-      "student_id": 4567890,
-      "student_name": "Nikita",
-      "student_surname": "Cernenko"
-    },
-    {
-      "student_id": 5678901,
-      "student_name": "William",
-      "student_surname": "Woods"
     }
   ]
 }
